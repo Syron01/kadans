@@ -3,59 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#161311" />
+  <meta name="theme-color" content="#000000" />
   <meta name="description" content="Kadans — açık kaynak müzik çalar. Ara, keşfet, dinle." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161311'/%3E%3Cpath d='M9 23V9l4 2v12z' fill='%23E4572E'/%3E%3Cpath d='M16 23V6l4 3v14z' fill='%23F2EBE4'/%3E%3Cpath d='M23 23v-9l3 2v7z' fill='%23E4572E'/%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Cpath d='M10 22V10h2.6v12z M15 22V8h2.6v14z M20 22v-7h2.6v7z' fill='%23E4E4E4'/%3E%3C/svg%3E" />
   <title>Kadans — Müzik Çalar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://invidious.flokinet.to" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Fraunces:ital,opsz,wght@1,9..144,560&display=swap" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&display=swap" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
   <div id="app">
     <aside class="rail" id="rail">
       <a class="wordmark" href="#" data-nav="home">
-        <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--bg-raised)"/><path d="M9 23V9l4 2v12z" fill="var(--accent)"/><path d="M16 23V6l4 3v14z" fill="var(--ink)"/><path d="M23 23v-9l3 2v7z" fill="var(--accent)"/></svg>
+        <span class="logo" aria-hidden="true"><i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/music_note_2_24_filled.svg)"></i></span>
         <span>Kadans</span>
       </a>
-      <nav class="rail-nav">
-        <button class="rail-link is-active" data-nav="home">
-          <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Keşfet
+      <nav class="rail-nav" aria-label="Bölümler">
+        <button class="rail-link is-active" data-nav="home" aria-label="Keşfet">
+          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/home_24_filled.svg)"></i>Keşfet
         </button>
-        <button class="rail-link" data-nav="search">
-          <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2.2"/></svg>Ara
+        <button class="rail-link" data-nav="search" aria-label="Ara">
+          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/search_24_filled.svg)"></i>Ara
         </button>
-        <button class="rail-link" data-nav="likes">
-          <svg viewBox="0 0 24 24"><path d="M12 21S4 14.5 4 9.3C4 6.4 6.2 4.5 8.6 4.5c1.5 0 2.7.8 3.4 2 .7-1.2 1.9-2 3.4-2C17.8 4.5 20 6.4 20 9.3 20 14.5 12 21 12 21z"/></svg>Beğeniler
+        <button class="rail-link" data-nav="likes" aria-label="Beğeniler">
+          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/heart_24_filled.svg)"></i>Beğeniler
         </button>
       </nav>
       <div class="rail-section">
         <div class="rail-head">
-          <span>Çalma Listeleri</span>
-          <button id="btn-new-pl" title="Yeni liste oluştur" aria-label="Yeni liste oluştur">+</button>
+          <span>Çalma listeleri</span>
+          <button id="btn-new-pl" aria-label="Yeni liste oluştur">
+            <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/add_24_filled.svg)"></i>
+          </button>
         </div>
         <div id="pl-list" class="pl-list"></div>
       </div>
       <div class="rail-foot">
-        <span class="net-dot" id="net-dot"></span><span id="net-label">bağlanıyor…</span>
+        <span class="net-dot" id="net-dot" aria-hidden="true"></span><span id="net-label">bağlanıyor…</span>
       </div>
     </aside>
 
     <main class="main" id="main">
       <header class="topbar">
         <div class="search-wrap" id="search-wrap">
-          <svg viewBox="0 0 24 24" class="search-ico"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2"/></svg>
-          <input id="search-input" type="search" placeholder="Şarkı, sanatçı ara…" autocomplete="off" enterkeyhint="search" />
+          <i class="ic search-ico" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/search_24_filled.svg)" aria-hidden="true"></i>
+          <input id="search-input" type="search" placeholder="Şarkı veya sanatçı ara" aria-label="Ara" autocomplete="off" enterkeyhint="search" />
         </div>
-        <a class="gh-link" href="https://github.com/Syron01/kadans" target="_blank" rel="noopener" title="Kaynak kod">
-          <svg viewBox="0 0 16 16" width="20" height="20"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-        </a>
+        <a class="gh-link" href="https://github.com/Syron01/kadans" target="_blank" rel="noopener">Kaynak kod</a>
       </header>
 
       <section id="view-home" class="view">
-        <h1 class="page-title">Bu hafta<br><em>trend olanlar</em></h1>
+        <h1 class="page-title">Bu hafta trend olanlar</h1>
         <div id="home-grid" class="grid"></div>
       </section>
 
@@ -65,7 +65,7 @@
       </section>
 
       <section id="view-likes" class="view" hidden>
-        <h1 class="page-title">Beğenilen<br><em>şarkılar</em></h1>
+        <h1 class="page-title">Beğenilen şarkılar</h1>
         <div id="likes-list" class="list"></div>
       </section>
 
@@ -80,33 +80,33 @@
     <div class="player-main">
       <img id="np-art" class="np-art" alt="" hidden />
       <div class="np-art np-art--ph" id="np-art-ph" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="7" cy="18" r="2.4"/><circle cx="17" cy="16" r="2.4"/></svg>
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/music_note_2_24_filled.svg)"></i>
       </div>
       <div class="np-meta">
         <span class="np-title" id="np-title">Bir şey çalmıyor</span>
         <span class="np-artist" id="np-artist">Kadans</span>
       </div>
-      <button class="icon-btn like-btn" id="btn-like" title="Beğen" hidden>
-        <svg viewBox="0 0 24 24"><path d="M12 21S4 14.5 4 9.3C4 6.4 6.2 4.5 8.6 4.5c1.5 0 2.7.8 3.4 2 .7-1.2 1.9-2 3.4-2C17.8 4.5 20 6.4 20 9.3 20 14.5 12 21 12 21z"/></svg>
+      <button class="icon-btn like-btn" id="btn-like" title="Beğen" aria-label="Beğen" hidden>
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/heart_24_filled.svg)"></i>
       </button>
     </div>
     <div class="player-center">
       <div class="controls">
-        <button class="icon-btn" id="btn-shuffle" title="Karıştır">
-          <svg viewBox="0 0 24 24"><path d="M16 4l4 3-4 3M16 14l4 3-4 3M20 7h-4.5c-2 0-3 1-4.3 3L9 13c-1.2 2-2.2 3-4.3 3H3M20 17h-4.5c-2 0-3-1-4.3-3M3 7h1.7c2.1 0 3.1 1 4.3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="icon-btn" id="btn-shuffle" title="Karıştır" aria-label="Karıştır" aria-pressed="false">
+          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_shuffle_24_filled.svg)"></i>
         </button>
-        <button class="icon-btn" id="btn-prev" title="Önceki">
-          <svg viewBox="0 0 24 24"><path d="M7 6v12M18 6l-8 6 8 6z"/></svg>
+        <button class="icon-btn" id="btn-prev" title="Önceki" aria-label="Önceki">
+          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/previous_24_filled.svg)"></i>
         </button>
-        <button class="play-btn" id="btn-play" title="Oynat/Duraklat">
-          <svg class="ic-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg>
-          <svg class="ic-pause" viewBox="0 0 24 24" hidden><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z"/></svg>
+        <button class="play-btn" id="btn-play" title="Oynat veya duraklat" aria-label="Oynat veya duraklat">
+          <i class="ic ic-play" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/play_24_filled.svg)"></i>
+          <i class="ic ic-pause" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/pause_24_filled.svg)" hidden></i>
         </button>
-        <button class="icon-btn" id="btn-next" title="Sonraki">
-          <svg viewBox="0 0 24 24"><path d="M17 6v12M6 6l8 6-8 6z"/></svg>
+        <button class="icon-btn" id="btn-next" title="Sonraki" aria-label="Sonraki">
+          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/next_24_filled.svg)"></i>
         </button>
-        <button class="icon-btn" id="btn-repeat" title="Tekrar">
-          <svg viewBox="0 0 24 24"><path d="M17 3l3 3-3 3M20 6H8a5 5 0 0 0-5 5v1M7 21l-3-3 3-3M4 18h12a5 5 0 0 0 5-5v-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="icon-btn" id="btn-repeat" title="Tekrar" aria-label="Tekrar" aria-pressed="false">
+          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_repeat_all_24_filled.svg)"></i>
         </button>
       </div>
       <div class="seek-row">
@@ -116,10 +116,10 @@
       </div>
     </div>
     <div class="player-right">
-      <button class="icon-btn" id="btn-queue" title="Sıra">
-        <svg viewBox="0 0 24 24"><path d="M4 7h12M4 12h12M4 17h7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M20 17.5V8l1.5 1" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      <button class="icon-btn" id="btn-queue" title="Sıra" aria-label="Sıra" aria-expanded="false" aria-controls="queue-drawer">
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/text_bullet_list_ltr_24_filled.svg)"></i>
       </button>
-      <svg viewBox="0 0 24 24" class="vol-ico"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <i class="ic vol-ico" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/speaker_2_24_filled.svg)" aria-hidden="true"></i>
       <input class="vol" id="vol" type="range" min="0" max="100" value="90" aria-label="Ses" />
     </div>
   </footer>
@@ -127,15 +127,15 @@
   <div class="queue-drawer" id="queue-drawer" hidden>
     <div class="queue-head">
       <span>Sıra</span>
-      <button class="icon-btn" id="btn-queue-close" title="Kapat">
-        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <button class="icon-btn" id="btn-queue-close" title="Kapat" aria-label="Kapat">
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/dismiss_24_filled.svg)"></i>
       </button>
     </div>
     <div id="queue-list" class="queue-list"></div>
   </div>
 
-  <div class="toast" id="toast" hidden></div>
+  <div class="toast" id="toast" role="status" hidden></div>
   <audio id="audio" preload="auto"></audio>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

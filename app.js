@@ -274,7 +274,8 @@ function songRow(song, i, onPlay) {
   const like = document.createElement('button');
   like.className = 'icon-btn like-btn' + (isLiked(song.id) ? ' is-on' : '');
   like.title = 'Beğen';
-  like.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 21S4 14.5 4 9.3C4 6.4 6.2 4.5 8.6 4.5c1.5 0 2.7.8 3.4 2 .7-1.2 1.9-2 3.4-2C17.8 4.5 20 6.4 20 9.3 20 14.5 12 21 12 21z"/></svg>';
+  like.setAttribute('aria-label', 'Beğen');
+  like.innerHTML = '<i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/heart_24_filled.svg)"></i>';
   like.addEventListener('click', () => {
     toggleLike(song);
     like.classList.toggle('is-on', isLiked(song.id));
@@ -289,7 +290,21 @@ function fillList(el, songs) {
     el.innerHTML = '<p class="empty-note">Burada henüz bir şey yok.</p>';
     return;
   }
-  songs.forEach((s, i) => el.appendChild(songRow(s, i, () => playQueue(songs, i))));
+  // Bilişsel yük: ilk 5 öğe açık, gerisi isteğe açılır.
+  const VISIBLE = 5;
+  const render = (count) => {
+    el.innerHTML = '';
+    songs.slice(0, count).forEach((s, i) => el.appendChild(songRow(s, i, () => playQueue(songs, i))));
+    if (songs.length > count) {
+      const more = document.createElement('button');
+      more.className = 'show-more';
+      more.textContent = `${songs.length - count} tane daha göster`;
+      more.addEventListener('click', () => render(count + 15));
+      el.appendChild(more);
+    }
+    markPlayingRow();
+  };
+  render(Math.min(VISIBLE, songs.length));
 }
 
 function markPlayingRow() {
@@ -342,7 +357,7 @@ function openPlaylist(id) {
   const pl = state.playlists.find(p => p.id === id);
   if (!pl) return;
   showView('playlist', id);
-  $('#pl-title').innerHTML = `${pl.name.replace(/</g, '&lt;')}<br><em>çalma listesi</em>`;
+  $('#pl-title').textContent = pl.name;
   fillList($('#pl-songs'), pl.songs);
 }
 
@@ -372,13 +387,22 @@ $('#btn-like').addEventListener('click', () => toggleLike(current()));
 $('#btn-shuffle').addEventListener('click', e => {
   state.shuffle = !state.shuffle;
   e.currentTarget.classList.toggle('is-on', state.shuffle);
+  e.currentTarget.setAttribute('aria-pressed', state.shuffle);
 });
 $('#btn-repeat').addEventListener('click', e => {
   state.repeat = !state.repeat;
   e.currentTarget.classList.toggle('is-on', state.repeat);
+  e.currentTarget.setAttribute('aria-pressed', state.repeat);
 });
-$('#btn-queue').addEventListener('click', () => { $('#queue-drawer').hidden = !$('#queue-drawer').hidden; });
-$('#btn-queue-close').addEventListener('click', () => ($('#queue-drawer').hidden = true));
+$('#btn-queue').addEventListener('click', e => {
+  const d = $('#queue-drawer');
+  d.hidden = !d.hidden;
+  e.currentTarget.setAttribute('aria-expanded', !d.hidden);
+});
+$('#btn-queue-close').addEventListener('click', () => {
+  $('#queue-drawer').hidden = true;
+  $('#btn-queue').setAttribute('aria-expanded', 'false');
+});
 
 $('#btn-new-pl').addEventListener('click', () => {
   const name = prompt('Çalma listesi adı:');
