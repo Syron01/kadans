@@ -2,7 +2,7 @@
 
 Açık kaynak, sunucusuz müzik çalar. Spotify gibi düşün: ara, bul, dinle — hesap yok, reklam yok, kurulum yok.
 
-**Canlı:** https://theayzek01.github.io/kadans
+**Canlı:** https://syron01.github.io/kadans
 
 ## Nasıl çalışıyor
 
