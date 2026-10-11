@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+ytmusicapi
+yt-dlp
+sqlalchemy
+pypresence
+requests

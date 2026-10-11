@@ -1,0 +1,8 @@
+node_modules/
+__pycache__/
+*.db
+.DS_Store
+backend.log
+__pycache__/
+*.db
+downloads/
