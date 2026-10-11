@@ -1,179 +1,790 @@
 <!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Kadans — açık kaynak müzik çalar. Ara, keşfet, dinle." />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Cpath d='M10 22V10h2.6v12z M15 22V8h2.6v14z M20 22v-7h2.6v7z' fill='%23E4E4E4'/%3E%3C/svg%3E" />
-  <title>Kadans — Müzik Çalar</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://invidious.flokinet.to" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&display=swap" />
-  <link rel="stylesheet" href="style.css?v=10" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kadans</title>
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23000'/%3E%3Cpath d='M10 22V10h2.6v12z M15 22V8h2.6v14z M20 22v-7h2.6v7z' fill='%23E4E4E4'/%3E%3C/svg%3E">
+<style>
+  /* Sıra sakin UI: saf siyah zemin, yüzey #070707, kenarlık ve gölge yok,
+     tek vurgu yok. Topuz ve ana düğme açık gri. Animasyon en fazla 0.2s. */
+  :root {
+    --bg: #000;
+    --surf: #070707;
+    --track: #141414;
+    --sel: #262626;
+    --ink: #C9C9C9;
+    --hi: #E4E4E4;
+    --muted: #6E6E6E;
+    --ease: cubic-bezier(.2,.7,.2,1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); }
+  body { font: 400 14px/1.5 "Hanken Grotesk", system-ui, -apple-system, sans-serif; color: var(--ink); max-width: 560px; margin: 0 auto; min-height: 100vh; overflow-x: hidden; }
+  button, input { font-family: inherit; }
+  button { -webkit-tap-highlight-color: transparent; }
+  button:active { transform: scale(.97); }
+  [hidden] { display: none !important; }
+  h1, h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; color: var(--hi); margin: 0; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* İkonlar: Fluent filled, CSS mask */
+  .ico { display: inline-block; flex: none; width: 20px; height: 20px; background-color: currentColor;
+    -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+  .i-home    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/home_24_filled.svg"); }
+  .i-search  { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/search_24_filled.svg"); }
+  .i-lib     { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/library_24_filled.svg"); }
+  .i-play    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/play_24_filled.svg"); }
+  .i-pause   { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/pause_24_filled.svg"); }
+  .i-prev    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/previous_24_filled.svg"); }
+  .i-next    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/next_24_filled.svg"); }
+  .i-shuffle { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_shuffle_24_filled.svg"); }
+  .i-repeat  { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_repeat_all_24_filled.svg"); }
+  .i-heart   { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/heart_24_filled.svg"); }
+  .i-down    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/chevron_down_24_filled.svg"); }
+  .i-back    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_left_24_filled.svg"); }
+  .i-more    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/more_horizontal_24_filled.svg"); }
+  .i-share   { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/share_24_filled.svg"); }
+  .i-plus    { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/add_24_filled.svg"); }
+  .i-queue   { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/text_bullet_list_24_filled.svg"); }
+  .i-right   { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/chevron_right_24_filled.svg"); }
+  .i-person  { --m: url("https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/person_24_filled.svg"); }
+
+  .view { padding: 12px 24px 170px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .view > * { min-width: 0; }
+  .top { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 12px; }
+  .top h1 { font-size: 26px; text-align: center; }
+  .round { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--track); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0; }
+  .round:hover { background: var(--sel); }
+  .ib { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0; }
+  .ib .ico { width: 22px; height: 22px; }
+  .ib[aria-pressed="true"] { color: var(--hi); background: var(--sel); }
+  .ib.liked { color: var(--hi); }
+
+  /* Bölüm etiketi */
+  .lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+
+  /* Segment */
+  .seg { display: inline-grid; grid-auto-flow: column; gap: 4px; background: var(--track); border-radius: 999px; padding: 4px; max-width: 100%; }
+  .seg button { height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font: 500 13px "Hanken Grotesk", sans-serif; cursor: pointer; white-space: nowrap; }
+  .seg button[aria-pressed="true"] { background: var(--sel); color: var(--hi); }
+
+  /* Arama alanı */
+  .field { height: 50px; border-radius: 999px; background: var(--track); display: flex; align-items: center; gap: 10px; padding: 0 18px; color: var(--muted); }
+  .field input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--hi); font: 400 15px "Hanken Grotesk", sans-serif; }
+  .field input::placeholder { color: var(--muted); }
+
+  /* Hızlı erişim */
+  .quick { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .q { display: flex; align-items: center; height: 60px; padding: 0; border: 0; border-radius: 18px; background: var(--surf); color: var(--hi); text-align: left; cursor: pointer; overflow: hidden; min-width: 0; }
+  .q .th { width: 60px; height: 60px; flex: none; background: var(--track); }
+  .q span:not(.th) { padding: 0 12px; font: 500 13.5px/1.25 "Hanken Grotesk", sans-serif; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .more { height: 40px; border: 0; background: transparent; color: var(--muted); font: 500 13px "Hanken Grotesk", sans-serif; cursor: pointer; padding: 0; justify-self: start; }
+
+  /* Kayan raylar */
+  .rail { display: grid; grid-auto-flow: column; grid-auto-columns: 150px; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 -24px; padding: 0 24px; scroll-padding: 0 24px; }
+  .rail::-webkit-scrollbar { display: none; }
+  .card { scroll-snap-align: start; border: 0; padding: 0; background: none; color: inherit; text-align: left; cursor: pointer; min-width: 0; }
+  .cv, .th { display: block; position: relative; }
+  .cv { width: 150px; height: 150px; border-radius: 18px; background: var(--track); overflow: hidden; }
+  .cv img, .th img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .card b { display: block; margin-top: 10px; font: 500 14px "Hanken Grotesk", sans-serif; color: var(--hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card small { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+  /* Sizin için */
+  .pick { display: grid; grid-template-columns: 72px 1fr 48px; align-items: center; gap: 14px; background: var(--surf); border-radius: 24px; padding: 6px; }
+  .pick .cv { width: 72px; height: 72px; border-radius: 18px; }
+  .pick .meta { min-width: 0; cursor: pointer; }
+  .pick .meta b { display: block; font: 500 15px "Hanken Grotesk", sans-serif; color: var(--hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pick .meta small { color: var(--muted); font-size: 12.5px; }
+  .play-c { width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--hi); color: #000; display: grid; place-items: center; cursor: pointer; padding: 0; }
+
+  /* Satırlar: kenarlık yok, yalnızca yüzey farkı */
+  .list { display: grid; gap: 4px; }
+  .row { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 12px; min-height: 60px; padding: 6px; border-radius: 18px; cursor: pointer; }
+  .row:hover { background: var(--track); }
+  .row.cur { background: var(--surf); }
+  .row .cv { width: 48px; height: 48px; border-radius: 12px; }
+  .row b { display: block; font: 500 14px "Hanken Grotesk", sans-serif; color: var(--hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row small { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  .row .side { display: flex; align-items: center; gap: 2px; font-size: 12px; color: var(--muted); }
+  .row .ib { width: 40px; height: 40px; }
+  .row .ib .ico { width: 18px; height: 18px; }
+  .sub { font-size: 13px; color: var(--muted); margin: 0; }
+  .emptyTxt { font-size: 13px; color: var(--muted); margin: 0; padding: 16px 0; }
+  .loading { height: 60px; border-radius: 18px; background: var(--surf); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .5; } }
+
+  /* Mini oynatıcı */
+  .mini { position: fixed; left: 0; right: 0; bottom: 78px; margin: 0 auto; max-width: 560px; padding: 0 16px; z-index: 5; }
+  .mini-in { position: relative; display: grid; grid-template-columns: 1fr 48px; align-items: center; gap: 8px; background: var(--surf); border-radius: 24px; padding: 6px; }
+  .mini-open { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 12px; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; padding: 0; min-width: 0; min-height: 52px; }
+  .mini-open .cv { width: 44px; height: 44px; border-radius: 14px; }
+  .mini-open b { display: block; font: 500 14px "Hanken Grotesk", sans-serif; color: var(--hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini-open small { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  .mini-bar { position: absolute; left: 18px; right: 18px; bottom: 2px; height: 2px; border-radius: 2px; background: var(--track); overflow: hidden; }
+  .mini-bar i { display: block; height: 100%; width: 0; background: var(--hi); }
+
+  /* Alt gezinme */
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; max-width: 560px; margin: 0 auto; height: 72px; padding-bottom: env(safe-area-inset-bottom, 0px); background: #000; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; z-index: 5; }
+  .nav button { border: 0; background: none; color: var(--muted); display: grid; justify-items: center; gap: 4px; font: 500 11.5px "Hanken Grotesk", sans-serif; cursor: pointer; padding: 0; }
+  .nav button[aria-current="page"] { color: var(--hi); }
+  .nav .ico { width: 22px; height: 22px; }
+
+  /* Tam ekran oynatıcı */
+  #np { position: fixed; inset: 0; z-index: 10; background: #000; max-width: 560px; margin: 0 auto; overflow-y: auto; padding: 14px 24px 40px; padding-top: calc(14px + env(safe-area-inset-top, 0px)); transform: translateY(100%); transition: transform .2s var(--ease); display: grid; align-content: start; gap: 28px; }
+  #np.open { transform: none; }
+  #np > * { position: relative; }
+  .np-top { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; }
+  .np-top p { margin: 0; text-align: center; font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+  .np-cover { width: 100%; max-width: 340px; aspect-ratio: 1; margin: 0 auto; border-radius: 24px; background: var(--track); overflow: hidden; }
+  .np-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .np-title { display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 8px; }
+  .np-title b { display: block; font: 600 20px/1.25 "Bricolage Grotesque", sans-serif; color: var(--hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .np-title small { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+  .prog { position: relative; height: 22px; cursor: pointer; touch-action: none; display: flex; align-items: center; }
+  .prog .rail-line { position: relative; width: 100%; height: 4px; border-radius: 4px; background: var(--track); }
+  .prog i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 4px; background: var(--hi); }
+  .prog b { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--hi); transform: translate(-50%, -50%); left: 0; }
+  .times { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 4px; }
+
+  .ctrl { display: grid; grid-template-columns: 44px 44px 72px 44px 44px; justify-content: space-between; align-items: center; }
+  .big { width: 72px; height: 72px; border: 0; border-radius: 50%; background: var(--hi); color: #000; display: grid; place-items: center; cursor: pointer; padding: 0; }
+  .big .ico { width: 28px; height: 28px; }
+  .big .ico + .ico { display: none; }
+  .big.playing .ico:first-child { display: none; }
+  .big.playing .ico + .ico { display: block; }
+
+  .tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .tool { height: 48px; border: 0; border-radius: 18px; background: var(--surf); color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 8px; font: 500 13px "Hanken Grotesk", sans-serif; cursor: pointer; padding: 0 10px; min-width: 0; }
+  .tool span.t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tool[aria-expanded="true"] { background: var(--sel); color: var(--hi); }
+
+  /* Alt sayfa menüsü (sheet) */
+  .sheet { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.6); display: flex; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity .2s var(--ease); }
+  .sheet.open { opacity: 1; }
+  .panel { width: 100%; max-width: 560px; background: var(--surf); border-radius: 28px 28px 0 0; padding: 10px 12px 28px; transform: translateY(16px); transition: transform .2s var(--ease); }
+  .sheet.open .panel { transform: none; }
+  .grab { width: 40px; height: 4px; border-radius: 4px; background: var(--sel); margin: 0 auto 10px; }
+  .panel h2 { font-size: 17px; padding: 6px 14px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .srow { width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 14px; border: 0; border-radius: 18px; background: transparent; color: var(--ink); font: 400 15px "Hanken Grotesk", sans-serif; text-align: left; cursor: pointer; }
+  .srow:hover { background: var(--track); }
+  .srow[aria-checked="true"], .srow[aria-current="true"] { color: var(--hi); }
+  .srow small { color: var(--muted); font-size: 12.5px; }
+  .sw { width: 46px; height: 28px; border-radius: 999px; background: var(--sel); position: relative; flex: none; }
+  .sw i { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--muted); transition: transform .2s var(--ease), background-color .2s var(--ease); }
+  .srow[aria-checked="true"] .sw { background: var(--sel); }
+  .srow[aria-checked="true"] .sw i { transform: translateX(18px); background: var(--hi); }
+
+  /* Kısa bildirim */
+  .toast { position: fixed; left: 50%; bottom: 150px; z-index: 40; transform: translate(-50%, 12px); opacity: 0; background: var(--sel); color: var(--hi); padding: 10px 16px; border-radius: 999px; font-size: 13px; pointer-events: none; transition: opacity .2s var(--ease), transform .2s var(--ease); white-space: nowrap; max-width: calc(100% - 48px); overflow: hidden; text-overflow: ellipsis; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
 </head>
 <body>
-  <div id="app">
-    <aside class="rail" id="rail">
-      <a class="wordmark" href="#" data-nav="home">
-        <span class="logo" aria-hidden="true"><i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/music_note_2_24_filled.svg)"></i></span>
-        <span>Kadans</span>
-      </a>
-      <nav class="rail-nav" aria-label="Bölümler">
-        <button class="rail-link is-active" data-nav="home" aria-label="Keşfet">
-          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/home_24_filled.svg)"></i>Keşfet
-        </button>
-        <button class="rail-link" data-nav="search" aria-label="Ara">
-          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/search_24_filled.svg)"></i>Ara
-        </button>
-        <button class="rail-link" data-nav="likes" aria-label="Beğeniler">
-          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/heart_24_filled.svg)"></i>Beğeniler
-        </button>
-      </nav>
-      <div class="rail-section">
-        <div class="rail-head">
-          <span>Çalma listeleri</span>
-          <button id="btn-new-pl" aria-label="Yeni liste oluştur">
-            <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/add_24_filled.svg)"></i>
-          </button>
-        </div>
-        <div id="pl-list" class="pl-list"></div>
-      </div>
-      <div class="rail-foot">
-        <span class="net-dot" id="net-dot" aria-hidden="true"></span><span id="net-label">bağlanıyor…</span>
-      </div>
-    </aside>
 
-    <main class="main" id="main">
-      <header class="topbar">
-        <div class="search-wrap" id="search-wrap">
-          <i class="ic search-ico" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/search_24_filled.svg)" aria-hidden="true"></i>
-          <input id="search-input" type="search" placeholder="Şarkı veya sanatçı ara" aria-label="Ara" autocomplete="off" enterkeyhint="search" />
-        </div>
-        <a class="gh-link" href="https://github.com/Syron01/kadans" target="_blank" rel="noopener">Kaynak kod</a>
-      </header>
+  <!-- ===== ANA ===== -->
+  <main class="view" id="home">
+    <header class="top">
+      <button class="round" type="button" id="btnProfile" aria-label="Profil"><span class="ico i-person" aria-hidden="true"></span></button>
+      <h1>Kadans</h1>
+      <button class="round" type="button" id="btnHomeMore" aria-label="Diğer"><span class="ico i-more" aria-hidden="true"></span></button>
+    </header>
 
-      <section id="view-home" class="view">
-        <h1 class="page-title">Bu hafta trend olanlar</h1>
-        <div id="home-grid" class="grid"></div>
-      </section>
+    <nav class="seg" role="group" aria-label="Tür" id="kind">
+      <button type="button" aria-pressed="true" data-g="">Tümü</button>
+      <button type="button" aria-pressed="false" data-g="Electronic">Elektronik</button>
+      <button type="button" aria-pressed="false" data-g="Hip-Hop/Rap">Hip-Hop</button>
+      <button type="button" aria-pressed="false" data-g="Pop">Pop</button>
+    </nav>
 
-      <section id="view-search" class="view" hidden>
-        <h1 class="page-title" id="search-title">Sonuçlar</h1>
-        <div id="search-list" class="list"></div>
-      </section>
+    <section>
+      <div class="quick" id="quick"></div>
+      <button class="more" type="button" id="quickMore" hidden></button>
+    </section>
 
-      <section id="view-likes" class="view" hidden>
-        <h1 class="page-title">Beğenilen şarkılar</h1>
-        <div id="likes-list" class="list"></div>
-      </section>
+    <section>
+      <p class="lbl">Sizin için</p>
+      <div class="pick" id="pick"></div>
+    </section>
 
-      <section id="view-playlist" class="view" hidden>
-        <h1 class="page-title" id="pl-title"></h1>
-        <div id="pl-songs" class="list"></div>
-      </section>
-    </main>
-  </div>
+    <section id="recentSec" hidden>
+      <p class="lbl">Son dinlenenler</p>
+      <div class="rail" id="recent"></div>
+    </section>
+  </main>
 
-  <footer class="player" id="player">
-    <div class="player-main">
-      <img id="np-art" class="np-art" alt="" hidden />
-      <div class="np-art np-art--ph" id="np-art-ph" aria-hidden="true">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/music_note_2_24_filled.svg)"></i>
-      </div>
-      <div class="np-meta">
-        <span class="np-title" id="np-title">Bir şey çalmıyor</span>
-        <span class="np-artist" id="np-artist">Kadans</span>
-      </div>
-      <button class="icon-btn like-btn" id="btn-like" title="Beğen" aria-label="Beğen" hidden>
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/heart_24_filled.svg)"></i>
-      </button>
-    </div>
-    <div class="player-center">
-      <div class="controls">
-        <button class="icon-btn" id="btn-shuffle" title="Karıştır" aria-label="Karıştır" aria-pressed="false">
-          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_shuffle_24_filled.svg)"></i>
-        </button>
-        <button class="icon-btn" id="btn-prev" title="Önceki" aria-label="Önceki">
-          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/previous_24_filled.svg)"></i>
-        </button>
-        <button class="play-btn" id="btn-play" title="Oynat veya duraklat" aria-label="Oynat veya duraklat">
-          <i class="ic ic-play" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/play_24_filled.svg)"></i>
-          <i class="ic ic-pause" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/pause_24_filled.svg)" hidden></i>
-        </button>
-        <button class="icon-btn" id="btn-next" title="Sonraki" aria-label="Sonraki">
-          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/next_24_filled.svg)"></i>
-        </button>
-        <button class="icon-btn" id="btn-repeat" title="Tekrar" aria-label="Tekrar" aria-pressed="false">
-          <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_repeat_all_24_filled.svg)"></i>
-        </button>
-      </div>
-      <div class="seek-row">
-        <span class="time" id="t-cur">0:00</span>
-        <input class="seek" id="seek" type="range" min="0" max="1000" value="0" aria-label="Konum" />
-        <span class="time" id="t-dur">0:00</span>
-      </div>
-    </div>
-    <div class="player-right">
-      <button class="icon-btn" id="btn-queue" title="Sıra" aria-label="Sıra" aria-expanded="false" aria-controls="queue-drawer">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/text_bullet_list_ltr_24_filled.svg)"></i>
-      </button>
-      <i class="ic vol-ico" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/speaker_2_24_filled.svg)" aria-hidden="true"></i>
-      <input class="vol" id="vol" type="range" min="0" max="100" value="90" aria-label="Ses" />
-    </div>
-  </footer>
+  <!-- ===== ARA ===== -->
+  <main class="view" id="search" hidden>
+    <header class="top">
+      <button class="round" type="button" data-back aria-label="Geri"><span class="ico i-back" aria-hidden="true"></span></button>
+      <h1>Ara</h1>
+      <span></span>
+    </header>
+    <label class="field">
+      <span class="ico i-search" aria-hidden="true"></span>
+      <input type="search" id="q" placeholder="Şarkı veya sanatçı" aria-label="Ara" autocomplete="off">
+    </label>
+    <section>
+      <p class="lbl" id="sLbl">Öneriler</p>
+      <div class="list" id="sres"></div>
+    </section>
+  </main>
 
-  <div class="queue-drawer" id="queue-drawer" hidden>
-    <div class="queue-head">
-      <span>Sıra</span>
-      <button class="icon-btn" id="btn-queue-close" title="Kapat" aria-label="Kapat">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/dismiss_24_filled.svg)"></i>
-      </button>
-    </div>
-    <div id="queue-list" class="queue-list"></div>
-  </div>
+  <!-- ===== KÜTÜPHANE ===== -->
+  <main class="view" id="library" hidden>
+    <header class="top">
+      <button class="round" type="button" data-back aria-label="Geri"><span class="ico i-back" aria-hidden="true"></span></button>
+      <h1>Kütüphane</h1>
+      <span></span>
+    </header>
+    <nav class="seg" role="group" aria-label="Kütüphane bölümü" id="libSeg">
+      <button type="button" aria-pressed="true" data-lt="liked">Beğenilenler</button>
+      <button type="button" aria-pressed="false" data-lt="pl">Çalma listeleri</button>
+    </nav>
+    <section class="list" id="libList"></section>
+  </main>
 
-  <div class="np-sheet" id="np-sheet" hidden aria-label="Şimdi çalıyor">
-    <div class="sheet-top">
-      <button class="icon-btn" id="sheet-close" title="Kapat" aria-label="Kapat">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/chevron_down_24_filled.svg)"></i>
+  <!-- Mini oynatıcı -->
+  <div class="mini" id="mini" hidden>
+    <div class="mini-in">
+      <button class="mini-open" type="button" id="miniOpen" aria-label="Oynatıcıyı aç">
+        <span class="cv"><img id="miniImg" alt=""></span>
+        <span style="min-width:0"><b id="miniT"></b><small id="miniA"></small></span>
       </button>
-      <span class="sheet-label">Şimdi çalıyor</span>
-      <span class="sheet-spacer" aria-hidden="true"></span>
-    </div>
-    <img id="sheet-art" class="sheet-art" alt="" />
-    <div class="sheet-meta">
-      <span class="np-title" id="sheet-title"></span>
-      <span class="np-artist" id="sheet-artist"></span>
-    </div>
-    <div class="seek-row sheet-seek">
-      <span class="time" id="sheet-t-cur">0:00</span>
-      <input class="seek" id="sheet-seek" type="range" min="0" max="1000" value="0" aria-label="Konum" />
-      <span class="time" id="sheet-t-dur">0:00</span>
-    </div>
-    <div class="controls sheet-controls">
-      <button class="icon-btn" id="sheet-shuffle" title="Karıştır" aria-label="Karıştır">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_shuffle_24_filled.svg)"></i>
-      </button>
-      <button class="icon-btn" id="sheet-prev" title="Önceki" aria-label="Önceki">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/previous_24_filled.svg)"></i>
-      </button>
-      <button class="play-btn" id="sheet-play" title="Oynat veya duraklat" aria-label="Oynat veya duraklat">
-        <i class="ic ic-play" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/play_24_filled.svg)"></i>
-        <i class="ic ic-pause" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/pause_24_filled.svg)" hidden></i>
-      </button>
-      <button class="icon-btn" id="sheet-next" title="Sonraki" aria-label="Sonraki">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/next_24_filled.svg)"></i>
-      </button>
-      <button class="icon-btn" id="sheet-repeat" title="Tekrar" aria-label="Tekrar">
-        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_repeat_all_24_filled.svg)"></i>
-      </button>
+      <button class="play-c" type="button" id="miniPlay" aria-label="Oynat veya duraklat"><span class="ico i-play" aria-hidden="true"></span></button>
+      <span class="mini-bar" aria-hidden="true"><i id="miniFill"></i></span>
     </div>
   </div>
 
-  <div class="toast" id="toast" role="status" hidden></div>
-  <audio id="audio" preload="auto"></audio>
-  <script src="app.js?v=15"></script>
+  <nav class="nav" aria-label="Alt menü" id="bottomNav">
+    <button type="button" data-v="home" aria-current="page"><span class="ico i-home" aria-hidden="true"></span>Ana</button>
+    <button type="button" data-v="search"><span class="ico i-search" aria-hidden="true"></span>Ara</button>
+    <button type="button" data-v="library"><span class="ico i-lib" aria-hidden="true"></span>Kütüphane</button>
+  </nav>
+
+  <!-- ===== TAM EKRAN OYNATICI ===== -->
+  <section id="np" aria-label="Oynatıcı">
+    <div class="np-top">
+      <button class="ib" type="button" id="npClose" aria-label="Kapat"><span class="ico i-down" aria-hidden="true"></span></button>
+      <p>Şu an çalıyor</p>
+      <button class="ib" type="button" id="npMore" aria-label="Diğer"><span class="ico i-more" aria-hidden="true"></span></button>
+    </div>
+
+    <div class="np-cover"><img id="npImg" alt=""></div>
+
+    <div class="np-title">
+      <div style="min-width:0"><b id="npT">—</b><small id="npA">Kadans</small></div>
+      <button class="ib" type="button" id="like" aria-pressed="false" aria-label="Beğen"><span class="ico i-heart" aria-hidden="true"></span></button>
+    </div>
+
+    <div>
+      <div class="prog" id="prog" role="slider" aria-label="Konum" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="rail-line"><i id="fill"></i><b id="knob"></b></div>
+      </div>
+      <div class="times"><span id="tNow">0:00</span><span id="tAll">0:00</span></div>
+    </div>
+
+    <div class="ctrl">
+      <button class="ib" type="button" id="shuffle" aria-pressed="false" aria-label="Karıştır"><span class="ico i-shuffle" aria-hidden="true"></span></button>
+      <button class="ib" type="button" id="prev" aria-label="Önceki"><span class="ico i-prev" aria-hidden="true"></span></button>
+      <button class="big" type="button" id="playBig" aria-label="Oynat"><span class="ico i-play" aria-hidden="true"></span><span class="ico i-pause" aria-hidden="true"></span></button>
+      <button class="ib" type="button" id="next" aria-label="Sonraki"><span class="ico i-next" aria-hidden="true"></span></button>
+      <button class="ib" type="button" id="repeat" aria-pressed="false" aria-label="Tekrar: kapalı"><span class="ico i-repeat" aria-hidden="true"></span></button>
+    </div>
+
+    <div class="tools">
+      <button class="tool" type="button" id="addBtn"><span class="ico i-plus" aria-hidden="true"></span><span class="t">Listeye ekle</span></button>
+      <button class="tool" type="button" id="shareBtn"><span class="ico i-share" aria-hidden="true"></span><span class="t">Paylaş</span></button>
+      <button class="tool" type="button" id="queueBtn" aria-expanded="false" aria-controls="queue" style="grid-column:1/-1"><span class="ico i-queue" aria-hidden="true"></span><span class="t">Sırada</span></button>
+    </div>
+
+    <div class="list" id="queue" hidden></div>
+  </section>
+
+  <!-- Alt menü -->
+  <div class="sheet" id="sheet" hidden>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="shTitle">
+      <div class="grab" aria-hidden="true"></div>
+      <h2 id="shTitle"></h2>
+      <div class="list" id="shList"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <audio id="audio" preload="metadata"></audio>
+
+  <script>
+  'use strict';
+  /* Altyapı: Audius — açık, anahtar gerektirmez, kendi CDN'inden 320kbps doğrudan akış.
+     Arama + akış tarayıcıdan çalışır; vekil sunucu kumarı yoktur. */
+  var AUD = 'https://api.audius.co/v1', APP = 'kadans';
+  var GENRES = { '': '', 'Electronic': 'Electronic', 'Hip-Hop/Rap': 'Hip-Hop/Rap', 'Pop': 'Pop' };
+
+  /* Durum */
+  var view = 'home', genre = '', quickOpen = false;
+  var queue = [], cur = -1, liked = load('kd_likes', {}), plists = load('kd_plists', []), recent = load('kd_recent', []);
+  var trendingCache = {};
+  var rep = 0, shuffle = false, toastT = null, sheetActs = [], searchT = null;
+
+  function $(id) { return document.getElementById(id); }
+  function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
+  function save() { localStorage.setItem('kd_likes', JSON.stringify(liked)); localStorage.setItem('kd_plists', JSON.stringify(plists)); localStorage.setItem('kd_recent', JSON.stringify(recent.slice(0, 12))); }
+  function esc(x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function fmt(sec) { if (!isFinite(sec)) return '0:00'; var m = Math.floor(sec / 60), s = Math.floor(sec % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
+  function clamp(v) { return Math.min(1, Math.max(0, v)); }
+
+  function norm(t) {
+    return {
+      id: t.id,
+      title: t.title || 'Bilinmeyen',
+      artist: (t.user && t.user.name) || 'Bilinmeyen',
+      art: (t.artwork && (t.artwork['480x480'] || t.artwork['150x150'])) || '',
+      dur: t.duration || 0,
+      permalink: t.permalink || ''
+    };
+  }
+  function art(img, size) {
+    var src = img || '';
+    if (!src) return '';
+    return '<img loading="lazy" src="' + esc(src) + '" alt="" onerror="this.remove()">';
+  }
+  function streamUrl(id) { return AUD + '/tracks/' + encodeURIComponent(id) + '/stream?app_name=' + APP; }
+
+  async function api(path) {
+    var lastErr;
+    for (var i = 0; i < 2; i++) {
+      try {
+        const res = await fetch(AUD + path + (path.includes('?') ? '&' : '?') + 'app_name=' + APP);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const j = await res.json();
+        if (j.error) throw new Error(j.error);
+        return j.data || [];
+      } catch (e) {
+        lastErr = e;
+        await new Promise(r => setTimeout(r, 600));
+      }
+    }
+    throw lastErr;
+  }
+  async function getTrending(g) {
+    var key = g || 'all';
+    if (trendingCache[key]) return trendingCache[key];
+    var p = '/tracks/trending?time=week&limit=24' + (GENRES[g] ? '&genre=' + encodeURIComponent(GENRES[g]) : '');
+    var list = (await api(p)).filter(t => !t.is_premium && !t.is_delete).map(norm);
+    trendingCache[key] = list;
+    return list;
+  }
+  async function doSearch(q) {
+    var list = await api('/tracks/search?query=' + encodeURIComponent(q) + '&limit=30');
+    return list.filter(t => !t.is_premium && !t.is_delete).map(norm);
+  }
+
+  function toast(msg) {
+    var el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { el.classList.remove('show'); }, 1800);
+  }
+
+  /* Alt sayfa */
+  function sheet(title, items) {
+    sheetActs = items;
+    $('shTitle').textContent = title;
+    $('shList').innerHTML = items.map(function (it, k) {
+      var attrs = it.sw !== undefined ? ' role="switch" aria-checked="' + it.sw + '"' : (it.cur ? ' aria-current="true"' : '');
+      var right = it.sw !== undefined ? '<span class="sw" aria-hidden="true"><i></i></span>' : (it.sub ? '<small>' + esc(it.sub) + '</small>' : '');
+      return '<button class="srow" type="button" data-k="' + k + '"' + attrs + '><span>' + esc(it.label) + '</span>' + right + '</button>';
+    }).join('');
+    $('sheet').hidden = false;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { $('sheet').classList.add('open'); }); });
+  }
+  function closeSheet() {
+    $('sheet').classList.remove('open');
+    setTimeout(function () { if (!$('sheet').classList.contains('open')) $('sheet').hidden = true; }, 200);
+  }
+  $('shList').addEventListener('click', function (e) {
+    var b = e.target.closest('.srow'); if (!b) return;
+    var it = sheetActs[Number(b.dataset.k)];
+    if (!it.stay) closeSheet();
+    it.act();
+  });
+  $('sheet').addEventListener('click', function (e) { if (e.target === this) closeSheet(); });
+
+  /* Listeye ekle menüsü */
+  function addSheet() {
+    var t = curSong();
+    if (!t) return;
+    var items = plists.map(function (p) {
+      return { label: p.name, sub: p.tracks.length + ' şarkı', act: function () {
+        if (!p.tracks.some(x => x.id === t.id)) p.tracks.push(t);
+        save(); toast(p.name + ' listesine eklendi');
+      } };
+    });
+    items.push({ label: 'Yeni çalma listesi…', act: function () {
+      var n = prompt('Çalma listesi adı:');
+      if (!n || !n.trim()) return;
+      plists.push({ name: n.trim(), tracks: [t] });
+      save(); toast('Liste oluşturuldu');
+    } });
+    sheet('Listeye ekle: ' + t.title, items);
+  }
+  function settingsSheet() {
+    sheet('Ayarlar', [
+      { label: 'Kaynak', sub: 'Audius · 320 kbps', act: function () { toast('Kaynak: Audius açık ağı'); } },
+      { label: 'Kaynak kod', sub: 'github.com/Syron01/kadans', act: function () { window.open('https://github.com/Syron01/kadans', '_blank'); } },
+      { label: 'Depoyu sıfırla', act: function () {
+          liked = {}; plists = []; recent = []; save();
+          renderAll(); toast('Beğeniler ve listeler silindi');
+      } }
+    ]);
+  }
+
+  function share(t) {
+    var txt = t.title + ' · ' + t.artist;
+    if (navigator.share) { navigator.share({ title: t.title, text: txt }).catch(function () {}); return; }
+    navigator.clipboard.writeText(txt).then(function () { toast('Kopyalandı'); }, function () { toast('Kopyalanamadı'); });
+  }
+
+  /* Görünümler */
+  function setView(v) {
+    view = v;
+    ['home', 'search', 'library'].forEach(function (k) { $(k).hidden = k !== v; });
+    Array.prototype.forEach.call(document.querySelectorAll('#bottomNav button'), function (b) {
+      if (b.dataset.v === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    if (v === 'search' && !$('sres').children.length) renderSearch();
+    if (v === 'library') renderLib();
+    window.scrollTo(0, 0);
+  }
+
+  /* Ana ekran */
+  function skel(el, n) { el.innerHTML = Array(n).fill('<div class="loading"></div>').join(''); }
+
+  async function renderHome() {
+    skel($('quick'), 4); skel($('pick'), 1);
+    try {
+      var list = await getTrending(genre);
+      renderQuick(list);
+      renderPick(list);
+    } catch (e) {
+      $('quick').innerHTML = '<p class="emptyTxt">Trendler yüklenemedi. Bağlantını kontrol et.</p>';
+      $('pick').innerHTML = '';
+    }
+  }
+  function renderQuick(list) {
+    var shown = quickOpen ? list : list.slice(0, 6);
+    $('quick').innerHTML = shown.map(function (t) {
+      return '<button class="q" type="button" data-play data-song=\'' + esc(JSON.stringify(t)) + '\'><span class="th">' + art(t.art, 120) + '</span><span>' + esc(t.title) + '</span></button>';
+    }).join('');
+    var left = list.length - 6;
+    $('quickMore').hidden = left <= 0;
+    $('quickMore').textContent = quickOpen ? 'Daha az göster' : left + ' tane daha göster';
+  }
+  function renderPick(list) {
+    var t = list[0];
+    if (!t) { $('pick').innerHTML = ''; return; }
+    $('pick').innerHTML =
+      '<span class="cv">' + art(t.art, 160) + '</span>' +
+      '<span class="meta" data-open data-song=\'' + esc(JSON.stringify(t)) + '\' role="button" tabindex="0"><b>' + esc(t.title) + '</b><small>' + esc(t.artist) + '</small></span>' +
+      '<button class="play-c" type="button" data-play data-song=\'' + esc(JSON.stringify(t)) + '\' aria-label="' + esc(t.title) + ' çal"><span class="ico i-play" aria-hidden="true"></span></button>';
+  }
+  function renderRecent() {
+    if (!recent.length) { $('recentSec').hidden = true; return; }
+    $('recentSec').hidden = false;
+    $('recent').innerHTML = recent.slice(0, 8).map(function (t) {
+      return '<button class="card" type="button" data-play="add:' + esc(t.id) + '" data-song=\'' + esc(JSON.stringify(t)) + '\'><span class="cv">' + art(t.art, 300) + '</span><b>' + esc(t.title) + '</b><small>' + esc(t.artist) + '</small></button>';
+    }).join('');
+  }
+
+  /* Arama */
+  function runSearch() {
+    var q = $('q').value.trim();
+    clearTimeout(searchT);
+    if (!q) { renderSearch(); return; }
+    $('sLbl').textContent = 'Aranıyor…';
+    skel($('sres'), 5);
+    searchT = setTimeout(async function () {
+      try {
+        var list = await doSearch(q);
+        $('sLbl').textContent = 'Sonuçlar';
+        $('sres').innerHTML = list.length
+          ? list.map(function (t) { return row(t); }).join('')
+          : '<p class="emptyTxt">Sonuç bulunamadı. Başka bir kelime dene.</p>';
+      } catch (e) {
+        $('sLbl').textContent = 'Arama başarısız';
+        $('sres').innerHTML = '<p class="emptyTxt">Ağ hatası. Tekrar dene.</p>';
+      }
+    }, 350);
+  }
+  function renderSearch() {
+    $('sLbl').textContent = 'Öneriler';
+    getTrending('').then(function (list) {
+      $('sres').innerHTML = list.slice(0, 6).map(row).join('');
+    }).catch(function () { $('sres').innerHTML = '<p class="emptyTxt">Öneriler yüklenemedi.</p>'; });
+  }
+
+  /* Kütüphane */
+  var libTab = 'liked';
+  function renderLib() {
+    var html = '';
+    if (libTab === 'liked') {
+      var ids = Object.keys(liked).filter(function (k) { return liked[k]; }).map(function (k) { return liked[k]; });
+      html = ids.length
+        ? ids.map(function (t) { return row(t); }).join('')
+        : '<p class="emptyTxt">Beğendiğin şarkılar burada görünür. Oynatıcıda kalbe dokun.</p>';
+    } else {
+      html = plists.length
+        ? plists.map(function (p, k) {
+            return '<div class="row" data-pl="' + k + '" role="button" tabindex="0"><span class="cv"></span>' +
+              '<span style="min-width:0"><b>' + esc(p.name) + '</b><small>' + p.tracks.length + ' şarkı</small></span>' +
+              '<span class="side"><span class="ico i-right" aria-hidden="true"></span></span></div>';
+          }).join('') + '<button class="srow" type="button" id="newPl" style="color:var(--hi)">Yeni çalma listesi…</button>'
+        : '<p class="emptyTxt">Listelerin burada durur. Oynatıcıda "Listeye ekle" ile oluştur.</p>';
+    }
+    $('libList').innerHTML = html;
+  }
+
+  /* Satır şablonu — t song objesi */
+  function row(t) {
+    var isCur = cur >= 0 && queue[cur] && queue[cur].id === t.id;
+    return '<div class="row' + (isCur ? ' cur' : '') + '" data-song=\'' + esc(JSON.stringify(t)) + '\' role="button" tabindex="0">' +
+      '<span class="cv">' + art(t.art, 96) + '</span>' +
+      '<span style="min-width:0"><b>' + esc(t.title) + '</b><small>' + esc(t.artist) + '</small></span>' +
+      '<span class="side"><span class="num">' + fmt(t.dur) + '</span>' +
+      '<button class="ib" type="button" data-more=\'' + esc(JSON.stringify(t)) + '\' aria-label="' + esc(t.title) + ' için seçenekler"><span class="ico i-more" aria-hidden="true"></span></button></span>' +
+      '</div>';
+  }
+
+  /* Oynatıcı */
+  var audio = $('audio');
+  function ensureQueue(t) {
+    if (!queue.some(x => x.id === t.id)) queue.unshift(t);
+    return queue.findIndex(x => x.id === t.id);
+  }
+  function setTrack(t, autoplay) {
+    cur = ensureQueue(t);
+    audio.src = streamUrl(t.id);
+    audio.play().catch(function () { toast('Oynatmak için dokun'); });
+    recent = recent.filter(x => x.id !== t.id);
+    recent.unshift(t);
+    save(); renderRecent();
+    paintAll();
+  }
+  function curSong() { return cur >= 0 ? queue[cur] : null; }
+  function paintAll() { paintNP(); paintQueue(); }
+
+  function nextIdx() {
+    if (shuffle && queue.length > 1) {
+      var n; do { n = Math.floor(Math.random() * queue.length); } while (n === cur);
+      return n;
+    }
+    return cur < queue.length - 1 ? cur + 1 : 0;
+  }
+  function next() { if (queue.length) { cur = nextIdx(); loadCur(true); } }
+  function prev() {
+    if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+    cur = cur > 0 ? cur - 1 : queue.length - 1;
+    loadCur(true);
+  }
+  function loadCur(play) {
+    var t = curSong(); if (!t) return;
+    audio.src = streamUrl(t.id);
+    if (play) audio.play().catch(function () {});
+    paintAll();
+  }
+
+  function toggleLike(t) {
+    liked[t.id] = liked[t.id] ? null : t;
+    if (!liked[t.id]) delete liked[t.id];
+    save();
+    toast(liked[t.id] ? 'Beğenilenlere eklendi' : 'Beğenilenlerden çıkarıldı');
+    paintNP();
+    if (view === 'library') renderLib();
+  }
+
+  function paintNP() {
+    var t = curSong();
+    if (!t) return;
+    $('npT').textContent = t.title;
+    $('npA').textContent = t.artist;
+    $('npImg').src = t.art || '';
+    $('miniT').textContent = t.title;
+    $('miniA').textContent = t.artist;
+    $('miniImg').src = t.art || '';
+    $('mini').hidden = false;
+    var l = !!liked[t.id];
+    $('like').setAttribute('aria-pressed', String(l));
+    $('like').classList.toggle('liked', l);
+    $('shuffle').setAttribute('aria-pressed', String(shuffle));
+    $('repeat').setAttribute('aria-pressed', String(rep !== 0));
+    $('repeat').setAttribute('aria-label', ['Tekrar: kapalı', 'Tekrar: tüm liste', 'Tekrar: bu şarkı'][rep]);
+    $('playBig').classList.toggle('playing', !audio.paused);
+    $('playBig').setAttribute('aria-label', audio.paused ? 'Oynat' : 'Duraklat');
+    document.querySelector('#miniPlay .ico').className = 'ico ' + (audio.paused ? 'i-play' : 'i-pause');
+    paintTime();
+    paintQueue();
+  }
+  function paintTime() {
+    var d = audio.duration || (curSong() && curSong().dur) || 0;
+    var pct = d ? Math.min(100, audio.currentTime / d * 100) : 0;
+    $('fill').style.width = pct + '%';
+    $('knob').style.left = pct + '%';
+    $('miniFill').style.width = pct + '%';
+    $('tNow').textContent = fmt(audio.currentTime);
+    $('tAll').textContent = fmt(d);
+    $('prog').setAttribute('aria-valuenow', Math.round(pct));
+  }
+  function paintQueue() {
+    var html = queue.length
+      ? '<p class="lbl" style="padding:6px 6px 0">Sıradakiler</p>' + queue.map(row).join('')
+      : '<p class="emptyTxt">Sıra boş. Bir şarkı çalınca burada görünür.</p>';
+    $('queue').innerHTML = html;
+  }
+
+  audio.addEventListener('play', paintNP);
+  audio.addEventListener('pause', paintNP);
+  audio.addEventListener('timeupdate', paintTime);
+  audio.addEventListener('loadedmetadata', paintTime);
+  audio.addEventListener('ended', function () {
+    if (rep === 2) { audio.currentTime = 0; audio.play(); return; }
+    if (rep === 1 && cur === queue.length - 1) { cur = 0; loadCur(true); return; }
+    next();
+  });
+  audio.addEventListener('error', function () {
+    if (!curSong()) return;
+    toast('Akış hatası, sonraki deneniyor');
+    setTimeout(next, 1000);
+  });
+
+  function seekFrom(clientX) {
+    var r = $('prog').getBoundingClientRect();
+    var d = audio.duration || (curSong() && curSong().dur) || 0;
+    if (d) audio.currentTime = clamp((clientX - r.left) / r.width) * d;
+  }
+  var dragging = false;
+  $('prog').addEventListener('pointerdown', function (e) { dragging = true; seekFrom(e.clientX); });
+  window.addEventListener('pointermove', function (e) { if (dragging) seekFrom(e.clientX); });
+  window.addEventListener('pointerup', function () { dragging = false; });
+
+  /* Olaylar */
+  document.body.addEventListener('click', function (e) {
+    var more = e.target.closest('[data-more]');
+    if (more) { e.stopPropagation(); trackSheetObj(JSON.parse(more.dataset.more)); return; }
+    var p = e.target.closest('[data-play]');
+    if (p) {
+      var host = p.closest('[data-song]');
+      if (host) setTrack(JSON.parse(host.dataset.song), true);
+      return;
+    }
+    var o = e.target.closest('[data-open]');
+    if (o) {
+      var host2 = o.closest('[data-song]');
+      if (host2) { ensureQueue(JSON.parse(host2.dataset.song)); paintAll(); openNP(); }
+      return;
+    }
+    var pl = e.target.closest('[data-pl]');
+    if (pl) {
+      var lst = plists[Number(pl.dataset.pl)];
+      if (lst.tracks.length) { setTrack(lst.tracks[0], true); toast(lst.name + ' başladı'); }
+      return;
+    }
+    if (e.target.closest('#newPl')) {
+      var n = prompt('Çalma listesi adı:');
+      if (n && n.trim()) { plists.push({ name: n.trim(), tracks: [] }); save(); renderLib(); }
+      return;
+    }
+    var bk = e.target.closest('[data-back]');
+    if (bk) { setView('home'); return; }
+  });
+  function trackSheetObj(t) {
+    var inQ = queue.some(x => x.id === t.id);
+    var items = [
+      { label: 'Şimdi çal', act: function () { setTrack(t, true); } },
+      { label: 'Sıraya ekle', act: function () { if (!inQ) { queue.push(t); paintQueue(); toast('Sıraya eklendi'); } } },
+      { label: liked[t.id] ? 'Beğenilenlerden çıkar' : 'Beğen', act: function () { toggleLike(t); } },
+      { label: 'Paylaş', act: function () { share(t); } }
+    ];
+    sheet(t.title, items);
+  }
+  document.body.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.matches('.row')) e.target.click();
+    if (e.key === 'Escape') { if (!$('sheet').hidden) closeSheet(); else $('np').classList.remove('open'); }
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('#bottomNav button'), function (b) {
+    b.addEventListener('click', function () { setView(b.dataset.v); });
+  });
+
+  $('btnProfile').addEventListener('click', function () {
+    sheet('Profil', [
+      { label: 'Beğenilenler', sub: Object.keys(liked).length + ' şarkı', act: function () { libTab = 'liked'; setView('library'); } },
+      { label: 'Ayarlar', act: settingsSheet },
+      { label: 'Kaynak kod', sub: 'GitHub', act: function () { window.open('https://github.com/Syron01/kadans', '_blank'); } }
+    ]);
+  });
+  $('btnHomeMore').addEventListener('click', settingsSheet);
+
+  $('kind').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    genre = b.dataset.g;
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    quickOpen = false;
+    renderHome();
+  });
+  $('quickMore').addEventListener('click', function () { quickOpen = !quickOpen; getTrending(genre).then(renderQuick); });
+
+  $('libSeg').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    libTab = b.dataset.lt;
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    renderLib();
+  });
+
+  $('q').addEventListener('input', runSearch);
+  $('q').addEventListener('keydown', function (e) { if (e.key === 'Enter') runSearch(); });
+
+  $('miniPlay').addEventListener('click', function (e) { e.stopPropagation(); audio.paused ? audio.play() : audio.pause(); });
+  $('miniOpen').addEventListener('click', openNP);
+  function openNP() { $('np').classList.add('open'); }
+  $('npClose').addEventListener('click', function () { $('np').classList.remove('open'); });
+  $('npMore').addEventListener('click', function () { if (curSong()) trackSheetObj(curSong()); });
+
+  $('playBig').addEventListener('click', function () { audio.paused ? audio.play() : audio.pause(); });
+  $('next').addEventListener('click', next);
+  $('prev').addEventListener('click', prev);
+
+  $('shuffle').addEventListener('click', function () {
+    shuffle = !shuffle;
+    toast(shuffle ? 'Karıştır açık' : 'Karıştır kapalı');
+    paintNP();
+  });
+  $('repeat').addEventListener('click', function () {
+    rep = (rep + 1) % 3;
+    toast(['Tekrar kapalı', 'Tüm liste tekrar', 'Bu şarkı tekrar'][rep]);
+    paintNP();
+  });
+  $('like').addEventListener('click', function () { if (curSong()) toggleLike(curSong()); });
+
+  $('addBtn').addEventListener('click', function () { if (curSong()) addSheet(); });
+  $('shareBtn').addEventListener('click', function () { if (curSong()) share(curSong()); });
+  $('queueBtn').addEventListener('click', function () {
+    var open = this.getAttribute('aria-expanded') !== 'true';
+    this.setAttribute('aria-expanded', String(open));
+    $('queue').hidden = !open;
+  });
+
+  /* Başlangıç */
+  function renderAll() { renderHome(); renderRecent(); if (view === 'library') renderLib(); }
+  renderAll();
+  </script>
 </body>
 </html>
