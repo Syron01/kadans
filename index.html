@@ -134,8 +134,46 @@
     <div id="queue-list" class="queue-list"></div>
   </div>
 
+  <div class="np-sheet" id="np-sheet" hidden aria-label="Şimdi çalıyor">
+    <div class="sheet-top">
+      <button class="icon-btn" id="sheet-close" title="Kapat" aria-label="Kapat">
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/chevron_down_24_filled.svg)"></i>
+      </button>
+      <span class="sheet-label">Şimdi çalıyor</span>
+      <span class="sheet-spacer" aria-hidden="true"></span>
+    </div>
+    <img id="sheet-art" class="sheet-art" alt="" />
+    <div class="sheet-meta">
+      <span class="np-title" id="sheet-title"></span>
+      <span class="np-artist" id="sheet-artist"></span>
+    </div>
+    <div class="seek-row sheet-seek">
+      <span class="time" id="sheet-t-cur">0:00</span>
+      <input class="seek" id="sheet-seek" type="range" min="0" max="1000" value="0" aria-label="Konum" />
+      <span class="time" id="sheet-t-dur">0:00</span>
+    </div>
+    <div class="controls sheet-controls">
+      <button class="icon-btn" id="sheet-shuffle" title="Karıştır" aria-label="Karıştır">
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_shuffle_24_filled.svg)"></i>
+      </button>
+      <button class="icon-btn" id="sheet-prev" title="Önceki" aria-label="Önceki">
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/previous_24_filled.svg)"></i>
+      </button>
+      <button class="play-btn" id="sheet-play" title="Oynat veya duraklat" aria-label="Oynat veya duraklat">
+        <i class="ic ic-play" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/play_24_filled.svg)"></i>
+        <i class="ic ic-pause" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/pause_24_filled.svg)" hidden></i>
+      </button>
+      <button class="icon-btn" id="sheet-next" title="Sonraki" aria-label="Sonraki">
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/next_24_filled.svg)"></i>
+      </button>
+      <button class="icon-btn" id="sheet-repeat" title="Tekrar" aria-label="Tekrar">
+        <i class="ic" style="--m:url(https://unpkg.com/@fluentui/svg-icons@1.1.260/icons/arrow_repeat_all_24_filled.svg)"></i>
+      </button>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" hidden></div>
   <audio id="audio" preload="auto"></audio>
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

@@ -275,6 +275,32 @@ input[type="range"]:hover { background: linear-gradient(to right, #7a7a7a var(--
   padding: 10px 20px; border-radius: 18px; font-size: 13.5px; font-weight: 500;
 }
 
+/* ---------- tam ekran çalar (mobil) ---------- */
+.np-sheet {
+  position: fixed; inset: 0; z-index: 40;
+  background: var(--bg);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 16px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  animation: sheet-in .2s ease-out;
+}
+@keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
+.sheet-top { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.sheet-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-dim); }
+.sheet-spacer { width: 40px; }
+.sheet-art {
+  width: min(78vw, 340px); aspect-ratio: 1; object-fit: cover;
+  border-radius: 24px; background: var(--empty);
+  margin: auto 0 20px;
+}
+.sheet-meta { width: 100%; display: flex; flex-direction: column; gap: 2px; margin-bottom: 14px; }
+.sheet-meta .np-title { font-size: 18px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; white-space: normal; max-height: 2.6em; overflow: hidden; }
+.sheet-seek { width: 100%; }
+.sheet-controls { width: 100%; justify-content: space-between; padding: 6px 4px 0; }
+.sheet-controls .play-btn { width: 60px; height: 60px; }
+.sheet-controls .play-btn .ic { width: 24px; height: 24px; }
+.sheet-controls .icon-btn { width: 48px; height: 48px; }
+.sheet-controls .icon-btn .ic { width: 20px; height: 20px; }
+
 /* ---------- mobil ---------- */
 @media (max-width: 880px) {
   :root { --player-h: 76px; }
@@ -292,9 +318,10 @@ input[type="range"]:hover { background: linear-gradient(to right, #7a7a7a var(--
   .rail-link .ic { width: 20px; height: 20px; }
   .rail-link:hover { background: none; }
   .rail-link.is-active { background: var(--empty); }
-  .player { grid-template-columns: 1fr auto; gap: 8px; padding: 0 16px; }
+  .player { grid-template-columns: 1fr auto; gap: 8px; padding: 0 12px 0 calc(12px + env(safe-area-inset-left, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .player-center, .player-right { display: none; }
-  .player-main { gap: 10px; }
+  .player-main { gap: 10px; min-height: 64px; border-radius: 18px; }
+  .player-main:active { background: var(--surface); }
   .np-art, .np-art--ph { width: 46px; height: 46px; }
   .page-title { font-size: 26px; margin: 8px 0 28px; }
   .main { padding: 0 24px 32px; }

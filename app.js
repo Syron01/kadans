@@ -103,24 +103,27 @@ const API_BASE = _apiParam && _apiParam !== '0' ? _apiParam : (localStorage.getI
 
 async function getStreamUrl(videoId) {
   if (API_BASE) return `${API_BASE}/stream?videoId=${videoId}&quality=high`;
-  // Bazı örneklerde companion hata verir; her örnekte 2 deneme yap, ilk başarılı URL'yi al.
-  for (const base of INSTANCES) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 12000);
-      try {
-        const res = await fetch(`${base}/api/v1/videos/${videoId}`, { signal: ctrl.signal });
-        clearTimeout(t);
-        if (!res.ok) continue;
-        const data = await res.json();
-        const audio = (data.adaptiveFormats || [])
-          .filter(f => f.url && (f.type || '').startsWith('audio'))
-          .sort((a, b) => (parseInt(b.bitrate) || 0) - (parseInt(a.bitrate) || 0));
-        if (audio[0]?.url) return audio[0].url;
-      } catch {
-        clearTimeout(t);
+  // Örnekler anlık düşebiliyor: her örnekte 3 deneme + tüm tur biterse bir tur daha.
+  for (let round = 0; round < 2; round++) {
+    for (const base of INSTANCES) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 12000);
+        try {
+          const res = await fetch(`${base}/api/v1/videos/${videoId}`, { signal: ctrl.signal });
+          clearTimeout(t);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const audio = (data.adaptiveFormats || [])
+            .filter(f => f.url && (f.type || '').startsWith('audio'))
+            .sort((a, b) => (parseInt(b.bitrate) || 0) - (parseInt(a.bitrate) || 0));
+          if (audio[0]?.url) return audio[0].url;
+        } catch {
+          clearTimeout(t);
+        }
       }
     }
+    if (round === 0) await new Promise(r => setTimeout(r, 1500));
   }
   throw new Error('Ses akışı alınamadı');
 }
@@ -501,6 +504,47 @@ audio.addEventListener('play', () => {
       artwork: [{ src: current().thumbnail || '', sizes: '512x512' }],
     });
   }
+});
+
+/* ---------- tam ekran çalar (mobil) ---------- */
+const sheet = $('#np-sheet');
+const proxy = (sheetId, mainId) => {
+  const s = $(sheetId), m = $(mainId);
+  if (!s || !m) return;
+  s.addEventListener('click', () => {
+    m.click();
+    syncSheet();
+  });
+};
+function syncSheet() {
+  const song = current();
+  $('#sheet-title').textContent = song ? song.title : 'Bir şey çalmıyor';
+  $('#sheet-artist').textContent = song ? song.artist : 'Kadans';
+  const art = $('#sheet-art');
+  if (song) { art.src = song.thumbnail || ''; art.hidden = false; }
+  $('#sheet-play .ic-play').hidden = state.playing;
+  $('#sheet-play .ic-pause').hidden = !state.playing;
+  $('#sheet-shuffle').classList.toggle('is-on', state.shuffle);
+  $('#sheet-repeat').classList.toggle('is-on', state.repeat);
+}
+$('#np-title').closest('.player-main').addEventListener('click', e => {
+  if (e.target.closest('.like-btn')) return;
+  if (window.innerWidth <= 880 && current()) { sheet.hidden = false; syncSheet(); }
+});
+$('#sheet-close').addEventListener('click', () => (sheet.hidden = true));
+proxy('#sheet-play', '#btn-play');
+proxy('#sheet-next', '#btn-next');
+proxy('#sheet-prev', '#btn-prev');
+proxy('#sheet-shuffle', '#btn-shuffle');
+proxy('#sheet-repeat', '#btn-repeat');
+$('#sheet-seek').addEventListener('input', e => {
+  if (audio.duration) audio.currentTime = (e.target.value / 1000) * audio.duration;
+});
+audio.addEventListener('timeupdate', () => {
+  const a = $('#sheet-seek');
+  if (!a.matches(':active')) a.value = $('#seek').value;
+  $('#sheet-t-cur').textContent = $('#t-cur').textContent;
+  $('#sheet-t-dur').textContent = $('#t-dur').textContent;
 });
 
 /* başlangıç */
