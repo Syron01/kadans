@@ -103,12 +103,12 @@ const API_BASE = _apiParam && _apiParam !== '0' ? _apiParam : (localStorage.getI
 
 async function getStreamUrl(videoId) {
   if (API_BASE) return `${API_BASE}/stream?videoId=${videoId}&quality=high`;
-  // Örnekler anlık düşebiliyor: her örnekte 3 deneme + tüm tur biterse bir tur daha.
+  // Örnekler yoğunken video bazlı hata döner: hızlı dene, kaybeden şarkıda bekleme.
   for (let round = 0; round < 2; round++) {
     for (const base of INSTANCES) {
-      for (let attempt = 0; attempt < 3; attempt++) {
+      for (let attempt = 0; attempt < 2; attempt++) {
         const ctrl = new AbortController();
-        const t = setTimeout(() => ctrl.abort(), 12000);
+        const t = setTimeout(() => ctrl.abort(), 8000);
         try {
           const res = await fetch(`${base}/api/v1/videos/${videoId}`, { signal: ctrl.signal });
           clearTimeout(t);
@@ -123,7 +123,7 @@ async function getStreamUrl(videoId) {
         }
       }
     }
-    if (round === 0) await new Promise(r => setTimeout(r, 1500));
+    if (round === 0) await new Promise(r => setTimeout(r, 1000));
   }
   throw new Error('Ses akışı alınamadı');
 }
@@ -212,13 +212,17 @@ function load(autoplay = false) {
     .then(url => {
       if (!url) throw new Error('Ses bulunamadı');
       if (current()?.id !== song.id) return;
+      load._fails = 0;
       audio.src = url;
       audio.play().then(() => toast.dismiss?.()).catch(() => {});
       $('#toast').hidden = true;
     })
     .catch(e => {
       console.error(e);
-      toast('Akış alınamadı, sonraki deneniyor…');
+      load._fails = (load._fails || 0) + 1;
+      toast(load._fails >= 3
+        ? 'Sunucular yoğun — Kadans’ı baslat.bat ile kendi sunucunla aç'
+        : 'Akış alınamadı, sonraki deneniyor…');
       setTimeout(next, 1200);
     });
   markPlayingRow();
