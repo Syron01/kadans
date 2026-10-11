@@ -6,3 +6,4 @@ backend.log
 __pycache__/
 *.db
 downloads/
+*.bin
